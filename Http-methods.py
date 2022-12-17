@@ -1,47 +1,33 @@
+import argparse
 import requests
-import sys
-from requests.structures import CaseInsensitiveDict
+from termcolor import colored
 
-headers=CaseInsensitiveDict()
-print("""
-	       __  __ ______ ______ ____                
-	      / / / //_  __//_  __// __ \               
-	     / /_/ /  / /    / /  / /_/ /               
-	    / __  /  / /    / /  / ____/                
-	   /_/ /_/  /_/    /_/  /_/                     
-    __  ___       __   __                __     
-   /  |/  /___   / /_ / /_   ____   ____/ /_____
-  / /|_/ // _ \ / __// __ \ / __ \ / __  // ___/
- / /  / //  __// /_ / / / // /_/ // /_/ /(__  ) 
-/_/  /_/ \___/ \__//_/ /_/ \____/ \__,_//____/ 
+# Parse command line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("--host", required=True, help="The host to test")
+parser.add_argument("--headers", help="Authorization headers to include in the requests (format: 'key1:value1,key2:value2')")
+args = parser.parse_args()
 
-	          ------------------          
-	       ~ |Do Hacks to Secure| ~
-	          ------------------
-	    https://twitter.com/thevillagehackr
-	    https://github.com/thevillagehacker 
+# Build the headers dictionary
+headers = {}
+if args.headers:
+    for header in args.headers.split(","):
+        key, value = header.split(":")
+        headers[key] = value
 
-Usage: Python3 HTTP.py <URL>
-""")
-print("Warning: Please add authz token in the code to check the authorized endpoints")
-url = sys.argv[1]
-
-# add the authz token header below change the header name accordingly
-headers["Authorization"] = ""
-
-try:
-	r = requests.get(url, headers=headers)
-	print("\n[+] GET Request: ",r.status_code)
-	r = requests.post(url, headers=headers)
-	print("[+] POST Request: ",r.status_code)
-	r = requests.options(url, headers=headers)
-	print("[+] OPTIONS Request: ",r.status_code)
-	print("[*] Allowed Headers:",r.headers["Allow"])
-	r = requests.head(url, headers=headers)
-	print("[+] HEAD Request: ",r.status_code)
-	r = requests.put(url, headers=headers)
-	print("[+] PUT Request: ",r.status_code)
-	r = requests.patch(url, headers=headers)
-	print("[+] PATCH Request: ",r.status_code)	
-except requests.ConnectionError:
-	print("Failed to connect")
+# Try each HTTP method
+methods = ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "CONNECT", "OPTIONS", "TRACE"]
+for method in methods:
+    try:
+        resp = requests.request(method, args.host, headers=headers)
+        if resp.status_code >= 200 and resp.status_code < 300:
+            color = "green"
+        elif resp.status_code >= 300 and resp.status_code < 400:
+            color = "yellow"
+        elif resp.status_code >= 400 and resp.status_code < 500:
+            color = "red"
+        else:
+            color = "grey"
+        print(f"{method}: {colored(resp.status_code, color)}")
+    except:
+        print(f"{method}: {colored('request failed', 'red')}")
