@@ -6,7 +6,7 @@ from termcolor import colored
 def print_banner(banner_text):
   banner_length = len(banner_text)
   print(" " * banner_length)
-  print(banner_text)
+  print(colored(banner_text, "green"))
   print(" " * banner_length)
 print_banner("""
           _|_|_  _   .|| _  _  _ |_  _  _|  _  _
