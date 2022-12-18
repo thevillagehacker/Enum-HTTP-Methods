@@ -12,21 +12,22 @@ import (
 
 var (
 	authHeader string
+	host       string
 )
 
 func init() {
 	flag.StringVar(&authHeader, "auth", "", "Authorization header to include in requests")
+	flag.StringVar(&host, "host", "", "target host")
 	flag.Parse()
 }
 
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatal("Usage: enumerate-http-methods <host>")
+		log.Fatal("Usage: go run main.go -h")
 	}
 
 	host := os.Args[1]
-
-	fmt.Println("Enumerating HTTP methods for host:", host)
+	fmt.Println("[+] Host: " + color.YellowString("%s", host))
 
 	methods := []string{
 		http.MethodGet,
