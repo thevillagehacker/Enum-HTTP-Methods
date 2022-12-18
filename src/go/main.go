@@ -6,24 +6,39 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/fatih/color"
 )
 
+func printBanner(bannerText string) {
+	bannerLength := len(bannerText)
+	fmt.Println(color.WhiteString("%s", strings.Repeat(" ", bannerLength)))
+	fmt.Println(color.GreenString("%s", bannerText))
+	fmt.Println(color.WhiteString("%s", strings.Repeat(" ", bannerLength)))
+}
+
 var (
 	authHeader string
-	host       string
 )
 
 func init() {
 	flag.StringVar(&authHeader, "auth", "", "Authorization header to include in requests")
-	flag.StringVar(&host, "host", "", "target host")
 	flag.Parse()
 }
 
 func main() {
+	printBanner(`
+          _|_|_  _   .|| _  _  _ |_  _  _|  _  _
+           | | |(/_\/|||(_|(_|(/_| |(_|(_|<(/_|
+                            _|
+                  ------------------
+               ~ |Do Hacks to Secure| ~
+                  ------------------
+           https://twitter.com/thevillagehackr
+`)
 	if len(os.Args) < 2 {
-		log.Fatal("Usage: go run main.go -h")
+		log.Fatal("Usage: go run main.go <host>")
 	}
 
 	host := os.Args[1]
